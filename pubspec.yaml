@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   camera: ^0.12.0
   gal: ^2.3.2
+  flutter_vision: ^1.1.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -89,3 +90,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  assets:
+    - assets/models/best_model_float32.tflite
+    - assets/models/labels.txt
