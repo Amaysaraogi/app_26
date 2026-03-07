@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
+import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 
 void main() {
   runApp(const MyApp());
@@ -56,17 +58,68 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+  late ImageLabeler _imageLabeler;
+  String _result = 'Tap the button to scan an item';
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+    _imageLabeler = ImageLabeler(options: ImageLabelerOptions());
+  }
+
+  Future<void> _initializeCamera() async {
+    final cameras = await availableCameras();
+    final firstCamera = cameras.first;
+    _controller = CameraController(
+      firstCamera,
+      ResolutionPreset.medium,
+    );
+    _initializeControllerFuture = _controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _imageLabeler.close();
+    super.dispose();
+  }
+
+  void _scanItem() async {
+    try {
+      await _initializeControllerFuture;
+      final image = await _controller.takePicture();
+      final inputImage = InputImage.fromFilePath(image.path);
+      final labels = await _imageLabeler.processImage(inputImage);
+      if (labels.isNotEmpty) {
+        final label = labels.first;
+        String bin = _getBinForLabel(label.label);
+        setState(() {
+          _result = 'Detected: ${label.label}\nConfidence: ${(label.confidence * 100).toStringAsFixed(1)}%\nBin: $bin';
+        });
+      } else {
+        setState(() {
+          _result = 'No items detected. Try again.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _result = 'Error: $e';
+      });
+    }
+  }
+
+  String _getBinForLabel(String label) {
+    // Simple mapping - in a real app, use a more sophisticated system
+    if (label.toLowerCase().contains('plastic') || label.toLowerCase().contains('bottle') || label.toLowerCase().contains('can')) {
+      return 'Recycle';
+    } else if (label.toLowerCase().contains('food') || label.toLowerCase().contains('organic')) {
+      return 'Compost';
+    } else {
+      return 'Landfill';
+    }
   }
 
   @override
@@ -88,39 +141,21 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
-            // subject hello
-
-            const Text('You have pushed the button this many times:'),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              _result,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        onPressed: _scanItem,
+        tooltip: 'Scan Item',
+        child: const Icon(Icons.camera),
       ),
     );
   }
