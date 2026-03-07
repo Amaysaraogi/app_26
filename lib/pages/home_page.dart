@@ -1,6 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:app_26/services/yolo_helper.dart';
 
+final YoloHelper _yoloHelper = YoloHelper();
 class HomePage extends StatefulWidget{
     const HomePage({super.key});
 
@@ -66,6 +68,7 @@ CameraController? cameraController;
 
     Future<void> _setupCameraController() async {
         List<CameraDescription> _cameras = await availableCameras();
+        cameraController!.startImageStream(_processCameraFrame);
         if(_cameras.isNotEmpty) {
             setState((){
                 cameras = _cameras;
@@ -76,4 +79,13 @@ CameraController? cameraController;
             });
         }
     }
+}
+
+
+void _processCameraFrame(CameraImage image) async {
+  final results = await _yoloHelper.detectObjects(image);
+  if (results.isNotEmpty) {
+    print("Detected: ${results[0]['tag']}"); 
+    // You can update a simple 'String' variable here to show the name
+  }
 }
