@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -79,13 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
           firstCamera,
           ResolutionPreset.medium,
         );
-        _initializeControllerFuture = _controller.initialize();
+        _initializeControllerFuture = _controller!.initialize();
       } else {
+        _initializeControllerFuture = Future.value(); // No camera, future completes immediately
         setState(() {
           _result = 'Camera not available on this device.';
         });
       }
     } catch (e) {
+      _initializeControllerFuture = Future.value(); // Error, future completes
       setState(() {
         _result = 'Camera error: $e\nTry running on web, iOS, or Android.';
       });
@@ -104,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _scanItem() async {
-    if (_controller == null || !_controller.value.isInitialized) {
+    if (_controller?.value.isInitialized != true) {
       setState(() {
         _result = 'Camera not initialized. Please run on a supported device.';
       });
@@ -112,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     try {
       await _initializeControllerFuture;
-      final image = await _controller.takePicture();
+      final image = await _controller!.takePicture();
       final inputImage = InputImage.fromFilePath(image.path);
       final labels = await _imageLabeler.processImage(inputImage);
       if (labels.isNotEmpty) {
