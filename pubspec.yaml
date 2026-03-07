@@ -92,5 +92,5 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
   assets:
-    - assets/models/best_model_float32.tflite
-    - assets/models/labels.txt
+    - assets/assets/models/best_model_float32.tflite
+    - assets/assets/models/labels.txt
