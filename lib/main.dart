@@ -58,7 +58,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late CameraController _controller;
+  CameraController? _controller;
   late Future<void> _initializeControllerFuture;
   late ImageLabeler _imageLabeler;
   String _result = 'Tap the button to scan an item';
@@ -66,28 +66,50 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _initializeML();
     _initializeCamera();
-    _imageLabeler = ImageLabeler(options: ImageLabelerOptions());
   }
 
   Future<void> _initializeCamera() async {
-    final cameras = await availableCameras();
-    final firstCamera = cameras.first;
-    _controller = CameraController(
-      firstCamera,
-      ResolutionPreset.medium,
-    );
-    _initializeControllerFuture = _controller.initialize();
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isNotEmpty) {
+        final firstCamera = cameras.first;
+        _controller = CameraController(
+          firstCamera,
+          ResolutionPreset.medium,
+        );
+        _initializeControllerFuture = _controller.initialize();
+      } else {
+        setState(() {
+          _result = 'Camera not available on this device.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _result = 'Camera error: $e\nTry running on web, iOS, or Android.';
+      });
+    }
+  }
+
+  void _initializeML() {
+    _imageLabeler = ImageLabeler(options: ImageLabelerOptions());
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     _imageLabeler.close();
     super.dispose();
   }
 
   void _scanItem() async {
+    if (_controller == null || !_controller.value.isInitialized) {
+      setState(() {
+        _result = 'Camera not initialized. Please run on a supported device.';
+      });
+      return;
+    }
     try {
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
