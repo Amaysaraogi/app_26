@@ -1,0 +1,35 @@
+PODS:
+  - camera_avfoundation (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_vision (0.0.1):
+    - Flutter
+  - gal (1.0.0):
+    - Flutter
+    - FlutterMacOS
+
+DEPENDENCIES:
+  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_vision (from `.symlinks/plugins/flutter_vision/ios`)
+  - gal (from `.symlinks/plugins/gal/darwin`)
+
+EXTERNAL SOURCES:
+  camera_avfoundation:
+    :path: ".symlinks/plugins/camera_avfoundation/ios"
+  Flutter:
+    :path: Flutter
+  flutter_vision:
+    :path: ".symlinks/plugins/flutter_vision/ios"
+  gal:
+    :path: ".symlinks/plugins/gal/darwin"
+
+SPEC CHECKSUMS:
+  camera_avfoundation: 968a9a5323c79a99c166ad9d7866bfd2047b5a9b
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_vision: a3ec7f2c56ea8c35ff9a6025d43c61db16096460
+  gal: baecd024ebfd13c441269ca7404792a7152fde89
+
+PODFILE CHECKSUM: 251cb053df7158f337c0712f2ab29f4e0fa474ce
+
+COCOAPODS: 1.16.2
