@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Waste Sorter AI")),
+      backgroundColor: Colors.black,
       body: _buildUI(),
     );
   }
