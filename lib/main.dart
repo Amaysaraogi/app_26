@@ -1,4 +1,4 @@
-import 'package:app_26/pages/home_page.dart';
+import 'package:green/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     // TODO: implement build
     Widget build(BuildContext context){
       return MaterialApp(
-        title: 'Waste sorter',
+        title: 'Green',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
